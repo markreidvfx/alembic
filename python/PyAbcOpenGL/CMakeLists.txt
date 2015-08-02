@@ -111,7 +111,7 @@ IF (Boost_PYTHON_LIBRARY AND ALEMBIC_PYTHON_LIBRARY)
   ENDIF()
 
   INSTALL(TARGETS alembicglmodule
-          LIBRARY DESTINATION lib)
+          LIBRARY DESTINATION lib/python${LIBPYTHON_VERSION}/site-packages)
 
 ELSE()
     MESSAGE( FATAL_ERROR "Unable to find Python libs" )

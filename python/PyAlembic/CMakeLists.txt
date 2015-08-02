@@ -174,7 +174,7 @@ IF (Boost_PYTHON_LIBRARY AND ALEMBIC_PYTHON_LIBRARY)
     ENDIF()
 
     INSTALL(TARGETS alembicmodule
-            LIBRARY DESTINATION lib)
+            LIBRARY DESTINATION lib/python${LIBPYTHON_VERSION}/site-packages)
 
     IF (USE_TESTS)
         ADD_SUBDIRECTORY(Tests)
