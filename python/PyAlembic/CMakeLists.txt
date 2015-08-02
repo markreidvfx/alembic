@@ -168,6 +168,11 @@ IF (Boost_PYTHON_LIBRARY AND ALEMBIC_PYTHON_LIBRARY)
     # to get rid of the "lib" prefix from cmake
     SET_TARGET_PROPERTIES(alembicmodule PROPERTIES PREFIX "")
 
+    # macosx python extensions have the .so suffix
+    IF (${DARWIN})
+        SET_TARGET_PROPERTIES(alembicmodule PROPERTIES SUFFIX ".so")
+    ENDIF()
+
     INSTALL(TARGETS alembicmodule
             LIBRARY DESTINATION lib)
 
