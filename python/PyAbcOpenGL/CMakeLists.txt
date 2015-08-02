@@ -92,6 +92,7 @@ IF (Boost_PYTHON_LIBRARY AND ALEMBIC_PYTHON_LIBRARY)
   )
 
   LINK_LIBRARIES(${CORE_LIBS}
+                 AlembicAbcOpenGL
                  ${PLIBS}
                  ${ALEMBIC_PYILMBASE_PYIMATH_LIB}
   )
