@@ -91,6 +91,16 @@ public:
     static MObject mIncludeFilterAttr;
     static MObject mExcludeFilterAttr;
 
+    // names of objects
+    static MObject mOutPropMetaAttr;
+    static MObject mOutSubDMetaAttr;
+    static MObject mOutPolyMetaAttr;
+    static MObject mOutCameraMetaAttr;
+    static MObject mOutNurbsCurveGrpMetaAttr;
+    static MObject mOutNurbsSurfaceMetaAttr;
+    static MObject mOutTransOpMetaAttr;
+    static MObject mOutLocatorPosScaleMetaAttr;
+
     // output attributes
     static MObject mOutPropArrayAttr;
     static MObject mOutSubDArrayAttr;
@@ -127,7 +137,7 @@ public:
     virtual MStringArray getFilesToArchive(bool shortName,
                                            bool unresolvedName,
                                            bool markCouldBeImageSequence) const;
-#if defined(MAYA_WANT_EXTERNALCONTENTTABLE)                                           
+#if defined(MAYA_WANT_EXTERNALCONTENTTABLE)
     virtual	void getExternalContent(MExternalContentInfoTable& table) const;
 	virtual	void setExternalContent(const MExternalContentLocationTable& table);
 #endif
@@ -187,6 +197,7 @@ private:
     MString mConnectRootNodes;
     MString mIncludeFilterString;
     MString mExcludeFilterString;
+    MString mNamesString;
 
     WriterData mData;
 };

@@ -1561,7 +1561,7 @@ void getAnimatedProps(Alembic::Abc::ICompoundProperty & iParent,
         else if (propHeader.isArray())
         {
             Alembic::Abc::IArrayProperty prop(iParent, propName);
-            if (prop.getNumSamples() == 0 || prop.isConstant())
+            if (prop.getNumSamples() == 0 )//|| prop.isConstant())
             {
                 continue;
             }
@@ -1570,7 +1570,7 @@ void getAnimatedProps(Alembic::Abc::ICompoundProperty & iParent,
         else if (propHeader.isScalar())
         {
             Alembic::Abc::IScalarProperty prop(iParent, propName);
-            if (prop.getNumSamples() == 0 || prop.isConstant())
+            if (prop.getNumSamples() == 0 )//|| prop.isConstant())
             {
                 continue;
             }
@@ -2920,7 +2920,7 @@ MString connectAttr(ArgData & iArgData)
     MDGModifier modifier;
     MPlug srcPlug, dstPlug;
 
-    MObject alembicNodeObj = modifier.createNode("AlembicNode", &status);
+    MObject alembicNodeObj = modifier.createNode("AlembicNodeEx", &status);
     MFnDependencyNode alembicNodeFn(alembicNodeObj, &status);
 
     AlembicNode *alembicNodePtr =

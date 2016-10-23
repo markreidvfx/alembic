@@ -72,7 +72,7 @@ void readComplex(double iFrame, Alembic::AbcGeom::IXform & iNode,
         iNode.getSchema().getNumSamples(),
         index, ceilIndex);
 
-    Alembic::Abc::M44d m; 
+    Alembic::Abc::M44d m;
 
     if (alpha != 0.0 && index != ceilIndex)
     {
@@ -220,6 +220,7 @@ void read(double iFrame, Alembic::AbcGeom::IXform & iNode,
 bool isComplex(const Alembic::AbcGeom::XformSample & iSamp)
 {
     int state = 0;
+    return true;
 
     bool scPivot = false;
     bool roPivot = false;
@@ -342,13 +343,13 @@ bool isComplex(const Alembic::AbcGeom::XformSample & iSamp)
                             state = 4;
                             xAxis = true;
                         }
-                        else if (v.x == 0 && v.y == 1 && v.z == 0 && !yAxis && 
+                        else if (v.x == 0 && v.y == 1 && v.z == 0 && !yAxis &&
                             state <= 4)
                         {
                             state = 4;
                             yAxis = true;
                         }
-                        else if (v.x == 0 && v.y == 0 && v.z == 1 && !zAxis && 
+                        else if (v.x == 0 && v.y == 0 && v.z == 1 && !zAxis &&
                             state <= 4)
                         {
                             state = 4;

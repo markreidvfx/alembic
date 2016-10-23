@@ -896,6 +896,20 @@ namespace
 
 }  // namespace
 
+unsigned int readPolyVertCount(double iFrame, PolyMeshAndFriends & iNode)
+{
+    Alembic::AbcGeom::IPolyMeshSchema schema = iNode.mMesh.getSchema();
+
+    Alembic::AbcCoreAbstract::index_t index, ceilIndex;
+    double alpha = getWeightAndIndex(iFrame,
+        schema.getTimeSampling(), schema.getNumSamples(), index, ceilIndex);
+
+    Alembic::Abc::P3fArraySamplePtr points = schema.getPositionsProperty(
+        ).getValue(Alembic::Abc::ISampleSelector(index));
+
+    return static_cast<unsigned int>(points->size());
+}
+
 void readPoly(double iFrame, MFnMesh & ioMesh, MObject & iParent,
     PolyMeshAndFriends & iNode, bool iInitialized)
 {

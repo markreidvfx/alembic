@@ -49,6 +49,17 @@ namespace ALEMBIC_VERSION_NS {
 #elif defined( _MSC_VER )
 #define COMPARE_EXCHANGE( V, COMP, EXCH ) (InterlockedCompareExchange64( &V, EXCH, COMP ) == COMP)
 
+// gcc 4.8 and above not using C++11
+#elif defined(__GNUC__) && __GNUC__ >= 4 && __GNUC_MINOR__ >= 8
+#define COMPARE_EXCHANGE( V, COMP, EXCH ) __atomic_compare_exchange_n( &V, &COMP, EXCH, false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST )
+// gcc 4.1 and above not using C++11
+#elif defined(__GNUC__) && __GNUC__ >= 4 && __GNUC_MINOR__ >= 1
+#define COMPARE_EXCHANGE( V, COMP, EXCH ) __sync_bool_compare_and_swap( &V, COMP, EXCH )
+#else
+#error Please contact alembic-discuss@googlegroups.com for support.
+#endif
+
+
 Alembic::Util::int64_t ffsll( Alembic::Util::int64_t iValue )
 {
     if ( !iValue )
@@ -67,16 +78,6 @@ Alembic::Util::int64_t ffsll( Alembic::Util::int64_t iValue )
     return 0;
 }
 
-
-// gcc 4.8 and above not using C++11
-#elif defined(__GNUC__) && __GNUC__ >= 4 && __GNUC_MINOR__ >= 8
-#define COMPARE_EXCHANGE( V, COMP, EXCH ) __atomic_compare_exchange_n( &V, &COMP, EXCH, false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST )
-// gcc 4.1 and above not using C++11
-#elif defined(__GNUC__) && __GNUC__ >= 4 && __GNUC_MINOR__ >= 1
-#define COMPARE_EXCHANGE( V, COMP, EXCH ) __sync_bool_compare_and_swap( &V, COMP, EXCH )
-#else
-#error Please contact alembic-discuss@googlegroups.com for support.
-#endif
 
 StreamManager::StreamManager( std::size_t iNumStreams )
 {

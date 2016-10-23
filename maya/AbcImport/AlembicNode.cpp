@@ -86,6 +86,15 @@ MObject AlembicNode::mEndFrameAttr;
 MObject AlembicNode::mIncludeFilterAttr;
 MObject AlembicNode::mExcludeFilterAttr;
 
+MObject AlembicNode::mOutPropMetaAttr;
+MObject AlembicNode::mOutSubDMetaAttr;
+MObject AlembicNode::mOutPolyMetaAttr;
+MObject AlembicNode::mOutCameraMetaAttr;
+MObject AlembicNode::mOutNurbsCurveGrpMetaAttr;
+MObject AlembicNode::mOutNurbsSurfaceMetaAttr;
+MObject AlembicNode::mOutTransOpMetaAttr;
+MObject AlembicNode::mOutLocatorPosScaleMetaAttr;
+
 MObject AlembicNode::mOutSubDArrayAttr;
 MObject AlembicNode::mOutPolyArrayAttr;
 MObject AlembicNode::mOutCameraArrayAttr;
@@ -115,6 +124,20 @@ namespace
 "editorTemplate -endScrollLayout;\n}"
     );
 };
+
+static MString getTopologyStr(Alembic::AbcGeom::MeshTopologyVariance tv)
+{
+
+    switch (tv) {
+    case Alembic::AbcGeom::kConstantTopology:
+        return "constant";
+    case Alembic::AbcGeom::kHomogenousTopology:
+        return "homogenous";
+    case Alembic::AbcGeom::kHeterogenousTopology:
+        return "heterogenous";
+    }
+    return "unknown";
+}
 
 MStatus AlembicNode::initialize()
 {
@@ -197,6 +220,54 @@ MStatus AlembicNode::initialize()
     status = nAttr.setWritable(false);
     status = nAttr.setStorable(true);
     status = addAttribute(mEndFrameAttr);
+
+    mOutPropMetaAttr = tAttr.create("outPropMeta", "opropm", MFnData::kString);
+    status = tAttr.setStorable(false);
+    status = tAttr.setWritable(false);
+    status = tAttr.setHidden(false);
+    status = addAttribute(mOutPropMetaAttr);
+
+    mOutSubDMetaAttr = tAttr.create("outSubDMeta", "osubdm", MFnData::kString);
+    status = tAttr.setStorable(false);
+    status = tAttr.setWritable(false);
+    status = tAttr.setHidden(false);
+    status = addAttribute(mOutSubDMetaAttr);
+
+    mOutPolyMetaAttr = tAttr.create("outPolyMeta", "opolym", MFnData::kString);
+    status = tAttr.setStorable(false);
+    status = tAttr.setWritable(false);
+    status = tAttr.setHidden(false);
+    status = addAttribute(mOutPolyMetaAttr);
+
+    mOutCameraMetaAttr = tAttr.create("outCameraMeta", "ocamm", MFnData::kString);
+    status = tAttr.setStorable(false);
+    status = tAttr.setWritable(false);
+    status = tAttr.setHidden(false);
+    status = addAttribute(mOutCameraMetaAttr);
+
+    mOutNurbsCurveGrpMetaAttr = tAttr.create("outNurbsCurveGrpMeta", "oncm", MFnData::kString);
+    status = tAttr.setStorable(false);
+    status = tAttr.setWritable(false);
+    status = tAttr.setHidden(false);
+    status = addAttribute(mOutNurbsCurveGrpMetaAttr);
+
+    mOutNurbsSurfaceMetaAttr = tAttr.create("outNurbsSurfaceMeta", "onsm", MFnData::kString);
+    status = tAttr.setStorable(false);
+    status = tAttr.setWritable(false);
+    status = tAttr.setHidden(false);
+    status = addAttribute(mOutNurbsSurfaceMetaAttr);
+
+    mOutTransOpMetaAttr = tAttr.create("outTransOpMeta", "otopm", MFnData::kString);
+    status = tAttr.setStorable(false);
+    status = tAttr.setWritable(false);
+    status = tAttr.setHidden(false);
+    status = addAttribute(mOutTransOpMetaAttr);
+
+    mOutLocatorPosScaleMetaAttr = tAttr.create("outLocatorPosScaleMeta", "olocm", MFnData::kString);
+    status = tAttr.setStorable(false);
+    status = tAttr.setWritable(false);
+    status = tAttr.setHidden(false);
+    status = addAttribute(mOutLocatorPosScaleMetaAttr);
 
     // add the output attributes
     // sampled subD mesh
@@ -311,6 +382,24 @@ MStatus AlembicNode::initialize()
     status = attributeAffects(mTimeAttr, mOutCameraArrayAttr);
     status = attributeAffects(mTimeAttr, mOutPropArrayAttr);
     status = attributeAffects(mTimeAttr, mOutLocatorPosScaleArrayAttr);
+
+    status = attributeAffects(mAbcFileNameAttr, mOutPropMetaAttr);
+    status = attributeAffects(mAbcFileNameAttr, mOutSubDMetaAttr);
+    status = attributeAffects(mAbcFileNameAttr, mOutPolyMetaAttr);
+    status = attributeAffects(mAbcFileNameAttr, mOutCameraMetaAttr);
+    status = attributeAffects(mAbcFileNameAttr, mOutNurbsCurveGrpMetaAttr);
+    status = attributeAffects(mAbcFileNameAttr, mOutNurbsSurfaceMetaAttr);
+    status = attributeAffects(mAbcFileNameAttr, mOutTransOpMetaAttr);
+    status = attributeAffects(mAbcFileNameAttr, mOutLocatorPosScaleMetaAttr);
+
+    status = attributeAffects(mAbcFileNameAttr, mOutSubDArrayAttr);
+    status = attributeAffects(mAbcFileNameAttr, mOutPolyArrayAttr);
+    status = attributeAffects(mAbcFileNameAttr, mOutNurbsSurfaceArrayAttr);
+    status = attributeAffects(mAbcFileNameAttr, mOutNurbsCurveGrpArrayAttr);
+    status = attributeAffects(mAbcFileNameAttr, mOutTransOpArrayAttr);
+    status = attributeAffects(mAbcFileNameAttr, mOutCameraArrayAttr);
+    status = attributeAffects(mAbcFileNameAttr, mOutPropArrayAttr);
+    status = attributeAffects(mAbcFileNameAttr, mOutLocatorPosScaleArrayAttr);
 
     status = attributeAffects(mSpeedAttr, mOutSubDArrayAttr);
     status = attributeAffects(mSpeedAttr, mOutPolyArrayAttr);
@@ -443,9 +532,9 @@ MStatus AlembicNode::setDependentsDirty(const MPlug& plug, MPlugArray& plugArray
 	and only display a warning.
 	In all other cases it could result in undesired behavior even scene corruption.
 	See issue MAYA-47471
-		mFileInitialized = false;
+	// mFileInitialized = false;
         mCurTime = DBL_MAX;	// to force update
-*/
+        */
 		if(mFileInitialized)
 		{
 			MGlobal::displayWarning("Repathing Alembic Nodes is not supported");
@@ -573,7 +662,352 @@ MStatus AlembicNode::compute(const MPlug & plug, MDataBlock & dataBlock)
         mCurTime = inputTime;
     }
 
-    if (plug == mOutPropArrayAttr)
+    if(plug == mOutPropMetaAttr)
+    {
+        MDataHandle outNamesHandle = dataBlock.outputValue(mOutPropMetaAttr, &status);
+        MString result;
+
+        result += "[";
+
+        for (int i = 0; i < mData.mPropList.size(); i++ ) {
+
+            Prop *prop = & mData.mPropList[i];
+            MString full_name;
+            MString prop_name;
+            MString type;
+
+            std::stringstream dtype;
+            bool isConstant;
+            MString str_value;
+
+            if (prop->mArray.valid()) {
+
+                full_name.set(prop->mArray.getObject().getFullName().c_str());
+                prop_name.set(prop->mArray.getName().c_str());
+                type = "array";
+                dtype << prop->mArray.getDataType();
+                isConstant = prop->mArray.isConstant();
+
+
+            } else if (prop->mScalar.valid() ){
+                full_name.set(prop->mScalar.getObject().getFullName().c_str());
+                prop_name.set(prop->mScalar.getName().c_str());
+                type = "scalar";
+                dtype << prop->mScalar.getDataType();
+                isConstant = prop->mScalar.isConstant();
+
+            }
+            if (i)
+                result += ",\n";
+
+            result += "{";
+            result += "\"path\":";
+
+            result += "\"" + full_name + "." + prop_name + "\"";
+            result += ", \"constant\": ";
+            result += isConstant ? "true" : "false";
+            result += ", \"arraytype\": \"" + type + "\"";
+            result += ", \"datatype\": ";
+
+            result += "\"";
+            result += dtype.str().c_str();
+            result += "\"";
+            result += "}";
+        }
+
+        result += "]";
+
+        outNamesHandle.set(result);
+        dataBlock.setClean(mOutPropMetaAttr);
+    }
+    else if(plug == mOutSubDMetaAttr)
+    {
+        MDataHandle outNamesHandle = dataBlock.outputValue(mOutSubDMetaAttr, &status);
+        MString result;
+        result += "[";
+        for (int i = 0; i < mData.mSubDList.size(); i++) {
+            MString full_name(mData.mSubDList[i].mMesh.getFullName().c_str());
+            bool isConstant = mData.mSubDList[i].mMesh.getSchema().isConstant();
+
+            MString topology = getTopologyStr(
+                mData.mSubDList[i].mMesh.getSchema().getTopologyVariance());
+
+            if (i)
+                result += ",\n";
+
+            result += "{";
+            result += "\"path\": ";
+            result += "\"" + full_name + "\"";
+            result += ", \"constant\": ";
+            result += isConstant ? "true" : "false";
+            result += ", \"topology\": ";
+            result += "\"" + topology + "\"";
+            result += "}";
+
+        }
+        result += "]";
+        outNamesHandle.set(result);
+        dataBlock.setClean(mOutSubDMetaAttr);
+    }
+    else if(plug == mOutPolyMetaAttr)
+    {
+        MDataHandle outNamesHandle = dataBlock.outputValue(mOutPolyMetaAttr, &status);
+        MString result;
+        result += "[";
+        for (int i = 0; i < mData.mPolyMeshList.size(); i++) {
+            MString full_name(mData.mPolyMeshList[i].mMesh.getFullName().c_str());
+            bool isConstant = mData.mPolyMeshList[i].mMesh.getSchema().isConstant();
+
+            MString topology = getTopologyStr(
+                mData.mPolyMeshList[i].mMesh.getSchema().getTopologyVariance());
+
+            unsigned int vertices = readPolyVertCount(mCurTime, mData.mPolyMeshList[i]);
+
+            if (i)
+                result += ",\n";
+
+            result += "{";
+            result += "\"path\": ";
+            result += "\"" + full_name + "\"";
+            result += ", \"constant\": ";
+            result += isConstant ? "true" : "false";
+            result += ", \"topology\": ";
+            result += "\"" + topology + "\"";
+            result += ", \"vertices\": ";
+            result += vertices;
+            result += "}";
+
+        }
+        result += "]";
+        outNamesHandle.set(result);
+        dataBlock.setClean(mOutPolyMetaAttr);
+    }
+    else if(plug == mOutCameraMetaAttr)
+    {
+        MDataHandle outNamesHandle = dataBlock.outputValue(mOutCameraMetaAttr, &status);
+        MString result;
+
+        std::vector<MString> camera_attrs;
+        camera_attrs.resize(18);
+        camera_attrs[0]  = "focalLength";
+        camera_attrs[1]  = "lensSqueezeRatio";
+        camera_attrs[2]  = "horizontalAperture";
+        camera_attrs[3]  = "verticalApertures";
+        camera_attrs[4]  = "horizontalFilmOffset";
+        camera_attrs[5]  = "verticalFilmOffset";
+        camera_attrs[6]  = "overscan";
+        camera_attrs[7]  = "nearClipPlane";
+        camera_attrs[8]  = "farClipPlane";
+        camera_attrs[9]  = "fStop";
+        camera_attrs[10] = "focusDistance";
+        camera_attrs[11] = "shutterAngle";
+        camera_attrs[12] = "filmFitOffset";
+        camera_attrs[13] = "preScale";
+        camera_attrs[14] = "filmTranslateH";
+        camera_attrs[15] = "filmTranslateV";
+        camera_attrs[16] = "postScale";
+        camera_attrs[17] = "cameraScale";
+
+
+        result += "[";
+
+        for (int i =0; i < mData.mCameraList.size(); i++) {
+            MString full_name(mData.mCameraList[i].getFullName().c_str());
+            bool isConstant = mData.mCameraList[i].getSchema().isConstant();
+
+            std::vector<double> array;
+            read(mCurTime, mData.mCameraList[i], array);
+
+            for (int j =0; j <camera_attrs.size(); j++) {
+                if(j+i)
+                    result += ",\n";
+
+                result += "{";
+                result += "\"path\": ";
+                result += "\"" + full_name + "." + camera_attrs[j] + "\"";
+                result += ", \"constant\": ";
+                result += isConstant ? "true" : "false";
+                result += ", \"value\": ";
+                result += array[j];
+                result += "}";
+            }
+
+        }
+        result += "]";
+
+        outNamesHandle.set(result);
+        dataBlock.setClean(mOutCameraMetaAttr);
+    }
+    else if(plug == mOutNurbsCurveGrpMetaAttr)
+    {
+
+        MDataHandle outNamesHandle = dataBlock.outputValue(mOutNurbsCurveGrpMetaAttr, &status);
+        MString result;
+        result += "[";
+        for (int i = 0; i < mData.mCurvesList.size(); i++) {
+            MString full_name(mData.mCurvesList[i].getFullName().c_str());
+            MString name = mData.mCurvesList[i].getName().c_str();
+            bool isConstant = mData.mCurvesList[i].getSchema().isConstant();
+
+            std::vector<MObject> curvesObj;
+            readCurves(mCurTime, mData.mCurvesList[i],
+                       mData.mNumCurves[i], curvesObj);
+            std::size_t numChild = curvesObj.size();
+
+            for (int j=0; j < curvesObj.size(); j ++) {
+
+                if (i + j)
+                    result += ",\n";
+
+                result += "{";
+                result += "\"path\": ";
+                result += "\"" + full_name + "/";
+                result += name + "Shape";
+                if (j)
+                    result += j;
+                result += "\"";
+
+                result += ", \"constant\": ";
+                result += isConstant ? "true" : "false";
+                result += "}";
+            }
+
+        }
+        result += "]";
+        outNamesHandle.set(result);
+        dataBlock.setClean(mOutNurbsCurveGrpMetaAttr);
+    }
+    else if(plug == mOutNurbsSurfaceMetaAttr)
+    {
+        MDataHandle outNamesHandle = dataBlock.outputValue(mOutNurbsSurfaceMetaAttr, &status);
+        MString result;
+        result += "[";
+        for (int i = 0; i < mData.mNurbsList.size(); i++) {
+            MString full_name(mData.mNurbsList[i].getFullName().c_str());
+            bool isConstant = mData.mNurbsList[i].getSchema().isConstant();
+
+            if (i)
+                result += ",\n";
+
+            result += "{";
+            result += "\"path\": ";
+            result += "\"" + full_name + "\"";
+            result += ", \"constant\": ";
+            result += isConstant ? "true" : "false";
+            result += "}";
+
+        }
+        result += "]";
+        outNamesHandle.set(result);
+        dataBlock.setClean(mOutNurbsSurfaceMetaAttr);
+    }
+    else if(plug == mOutTransOpMetaAttr)
+    {
+        MDataHandle outNamesHandle = dataBlock.outputValue(mOutTransOpMetaAttr, &status);
+        MString result;
+
+        std::vector<MString> xform_attrs;
+
+        xform_attrs.push_back("translateX");
+        xform_attrs.push_back("translateY");
+        xform_attrs.push_back("translateZ");
+        xform_attrs.push_back("rotatePivotTranslateX");
+        xform_attrs.push_back("rotatePivotTranslateY");
+        xform_attrs.push_back("rotatePivotTranslateZ");
+        xform_attrs.push_back("rotatePivotX");
+        xform_attrs.push_back("rotatePivotY");
+        xform_attrs.push_back("rotatePivotZ");
+        xform_attrs.push_back("rotateX");
+        xform_attrs.push_back("rotateY");
+        xform_attrs.push_back("rotateZ");
+        xform_attrs.push_back("rotateAxisX");
+        xform_attrs.push_back("rotateAxisY");
+        xform_attrs.push_back("rotateAxisZ");
+        xform_attrs.push_back("scalePivotTranslateX");
+        xform_attrs.push_back("scalePivotTranslateY");
+        xform_attrs.push_back("scalePivotTranslateZ");
+        xform_attrs.push_back("scalePivotX");
+        xform_attrs.push_back("scalePivotY");
+        xform_attrs.push_back("scalePivotZ");
+        xform_attrs.push_back("shearXY");
+        xform_attrs.push_back("shearXZ");
+        xform_attrs.push_back("shearYZ");
+        xform_attrs.push_back("scaleX");
+        xform_attrs.push_back("scaleY");
+        xform_attrs.push_back("scaleZ");
+
+        result += "[";
+
+
+
+        for (int i = 0; i < mData.mXformList.size(); i++) {
+            MString full_name(mData.mXformList[i].getFullName().c_str());
+            bool isConstant = mData.mXformList[i].getSchema().isConstant();
+
+            std::vector<double> sampleList;
+            readComplex(mCurTime, mData.mXformList[i], sampleList);
+
+            for (int j =0; j <xform_attrs.size(); j++) {
+                if (j+i)
+                    result += ",\n";
+                result += "{";
+                result += "\"path\": ";
+                result += "\"" + full_name + "." + xform_attrs[j] + "\"";
+                result += ", \"constant\": ";
+                result += isConstant ? "true" : "false";
+                result += ", \"value\": ";
+                result += sampleList[j];
+
+                result += "}";
+            }
+
+        }
+        result += "]";
+
+        outNamesHandle.set(result);
+        dataBlock.setClean(mOutTransOpMetaAttr);
+    }
+    else if(plug == mOutLocatorPosScaleMetaAttr)
+    {
+        MDataHandle outNamesHandle = dataBlock.outputValue(mOutLocatorPosScaleMetaAttr, &status);
+        MString result;
+        std::vector<MString> loc_attrs;
+
+        loc_attrs.push_back("localPositionX");
+        loc_attrs.push_back("localPositionY");
+        loc_attrs.push_back("localPositionZ");
+        loc_attrs.push_back("localScaleX");
+        loc_attrs.push_back("localScaleY");
+        loc_attrs.push_back("localScaleZ");
+        result += "[";
+        for (int i = 0; i < mData.mLocList.size(); i++) {
+            MString full_name(mData.mLocList[i].getFullName().c_str());
+            bool isConstant = mData.mXformList[i].getSchema().isConstant();
+
+            std::vector< double > sampleList;
+            read(mCurTime, mData.mLocList[i], sampleList);
+
+            for (int j =0; j <loc_attrs.size(); j++) {
+
+                if (j+i)
+                    result += ",\n";
+                result += "{";
+                result += "\"path\": ";
+                result += "\"" + full_name + "." + loc_attrs[j] + "\"";
+                result += ", \"constant\": ";
+                result += isConstant ? "true" : "false";
+                result += ", \"value\": ";
+                result += sampleList[j];
+                result += "}";
+
+            }
+        }
+        result += "]";
+
+        outNamesHandle.set(result);
+        dataBlock.setClean(mOutLocatorPosScaleMetaAttr);
+    }
+    else if(plug == mOutPropArrayAttr)
     {
 
         if (mOutRead[0])
@@ -665,15 +1099,16 @@ MStatus AlembicNode::compute(const MPlug & plug, MDataBlock & dataBlock)
             {
                 std::vector<double> sampleList;
 
-                if (mData.mIsComplexXform[i])
-                {
-                    readComplex(mCurTime, mData.mXformList[i], sampleList);
-                }
-                else
-                {
-                    Alembic::AbcGeom::XformSample samp;
-                    read(mCurTime, mData.mXformList[i], sampleList, samp);
-                }
+                // if (mData.mIsComplexXform[i])
+                // {
+                // always use complex
+                readComplex(mCurTime, mData.mXformList[i], sampleList);
+                // }
+                // else
+                // {
+                //     Alembic::AbcGeom::XformSample samp;
+                //     read(mCurTime, mData.mXformList[i], sampleList, samp);
+                // }
 
                 unsigned int sampleSize = (unsigned int)sampleList.size();
 
@@ -1173,4 +1608,3 @@ void AlembicNode::setExternalContent(const MExternalContentLocationTable& table)
    MPxNode::setExternalContent(table);
 }
 #endif
-

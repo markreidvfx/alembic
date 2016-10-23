@@ -49,6 +49,7 @@
 
 #include "NodeIteratorVisitorHelper.h"
 
+unsigned int readPolyVertCount(double iFrame, PolyMeshAndFriends & iNode);
 void readPoly(double iFrame, MFnMesh & ioMesh, MObject & iParent,
     PolyMeshAndFriends & iNode, bool iInitialized);
 

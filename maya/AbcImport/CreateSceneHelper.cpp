@@ -818,7 +818,8 @@ MStatus CreateSceneVisitor::operator()(Alembic::AbcGeom::ICamera & iNode)
     MStatus status = MS::kSuccess;
     MObject cameraObj = MObject::kNullObj;
 
-    bool isConstant = iNode.getSchema().isConstant();
+    //bool isConstant = iNode.getSchema().isConstant();
+    bool isConstant = false;
 
     // add animated camera to the list
     if (!isConstant)
@@ -896,7 +897,8 @@ MStatus CreateSceneVisitor::operator()(Alembic::AbcGeom::ICurves & iNode)
     MStatus status = MS::kSuccess;
     MObject curvesObj = MObject::kNullObj;
 
-    bool isConstant = iNode.getSchema().isConstant();
+    //bool isConstant = iNode.getSchema().isConstant();
+    bool isConstant = false;
 
     // read sample 0 to determine and use it to set the number of total
     // curves.  We can't support changing the number of curves over time.
@@ -1033,7 +1035,7 @@ MStatus CreateSceneVisitor::operator()(Alembic::AbcGeom::IPoints& iNode)
     MStatus status = MS::kSuccess;
     MObject particleObj = MObject::kNullObj;
 
-    bool isConstant = iNode.getSchema().isConstant();
+    bool isConstant = false; //iNode.getSchema().isConstant();
     if (!isConstant)
         mData.mPointsList.push_back(iNode);
 
@@ -1106,7 +1108,7 @@ MStatus CreateSceneVisitor::operator()(Alembic::AbcGeom::ISubD& iNode)
         subdAndFriends.mC3s, subdAndFriends.mC4s,
         mUnmarkedFaceVaryingColors);
 
-    bool isConstant = iNode.getSchema().isConstant();
+    bool isConstant = false;//iNode.getSchema().isConstant();
 
     // add animated SubDs to the list
     if (!isConstant || colorAnim)
@@ -1214,7 +1216,7 @@ MStatus CreateSceneVisitor::operator()(Alembic::AbcGeom::IPolyMesh& iNode)
     PolyMeshAndFriends meshAndFriends;
     meshAndFriends.mMesh = iNode;
 
-    bool isConstant = iNode.getSchema().isConstant();
+    bool isConstant = false; //iNode.getSchema().isConstant();
 
     Alembic::Abc::ICompoundProperty arbProp =
         iNode.getSchema().getArbGeomParams();
@@ -1324,7 +1326,7 @@ MStatus CreateSceneVisitor::operator()(Alembic::AbcGeom::INuPatch& iNode)
     MStatus status = MS::kSuccess;
     MObject nurbsObj = MObject::kNullObj;
 
-    bool isConstant = iNode.getSchema().isConstant();
+    bool isConstant = false;// iNode.getSchema().isConstant();
 
     // add animated poly mesh to the list
     if (!isConstant)
@@ -1429,7 +1431,7 @@ MStatus CreateSceneVisitor::operator()(Alembic::AbcGeom::IXform & iNode,
             locHead->getDataType().getExtent() == 6)
         {
             Alembic::Abc::IScalarProperty locProp(props, "locator");
-            bool isConstant = locProp.isConstant();
+            bool isConstant = false;//locProp.isConstant();
 
             Alembic::Abc::IScalarProperty visProp = getVisible(iNode,
                 isConstant, mData.mPropList, mData.mAnimVisStaticObjList);
@@ -1495,7 +1497,7 @@ MStatus CreateSceneVisitor::operator()(Alembic::AbcGeom::IXform & iNode,
         MString name(iNode.getName().c_str());
 
         size_t numChildren = iNodeObject->getNumChildren();
-        bool isConstant = iNode.getSchema().isConstant();
+        bool isConstant = false;//iNode.getSchema().isConstant();
 
         Alembic::Abc::IScalarProperty visProp = getVisible(iNode,
             isConstant, mData.mPropList, mData.mAnimVisStaticObjList);
@@ -1742,4 +1744,3 @@ MStatus CreateSceneVisitor::createEmptyObject(AlembicObjectPtr iNodeObject)
     }
     return status;
 }
-

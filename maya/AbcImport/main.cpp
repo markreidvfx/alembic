@@ -45,16 +45,16 @@
 #include <maya/MGlobal.h>
 
 // Interesting trivia: 0x2697 is the unicode character for Alembic
-const MTypeId AlembicNode::mMayaNodeId(0x00082697);
+const MTypeId AlembicNode::mMayaNodeId(0x00082697 + 0x50);
 
 ALEMBIC_MAYA_PLUGIN_EXPORT MStatus initializePlugin(MObject obj)
 {
     const char * pluginVersion = "1.0";
-    MFnPlugin plugin(obj, "Alembic", pluginVersion, "Any");
+    MFnPlugin plugin(obj, "AlembicEx", pluginVersion, "Any");
 
     MStatus status;
 
-    status = plugin.registerCommand("AbcImport",
+    status = plugin.registerCommand("AbcImportEx",
                                 AbcImport::creator,
                                 AbcImport::createSyntax);
     if (!status)
@@ -62,7 +62,7 @@ ALEMBIC_MAYA_PLUGIN_EXPORT MStatus initializePlugin(MObject obj)
         status.perror("registerCommand");
     }
 
-    status = plugin.registerNode("AlembicNode",
+    status = plugin.registerNode("AlembicNodeEx",
                                 AlembicNode::mMayaNodeId,
                                 &AlembicNode::creator,
                                 &AlembicNode::initialize);
@@ -71,7 +71,7 @@ ALEMBIC_MAYA_PLUGIN_EXPORT MStatus initializePlugin(MObject obj)
         status.perror("registerNode");
     }
 
-    status = plugin.registerFileTranslator("Alembic",
+    status = plugin.registerFileTranslator("AlembicEx",
                                 NULL,
                                 AlembicImportFileTranslator::creator,
                                 NULL,
@@ -82,7 +82,7 @@ ALEMBIC_MAYA_PLUGIN_EXPORT MStatus initializePlugin(MObject obj)
         status.perror("registerFileTranslator");
     }
 
-    MString info = "AbcImport v";
+    MString info = "AbcImportEx v";
     info += pluginVersion;
     info += " using ";
     info += Alembic::AbcCoreAbstract::GetLibraryVersion().c_str();
@@ -97,7 +97,7 @@ ALEMBIC_MAYA_PLUGIN_EXPORT  MStatus uninitializePlugin(MObject obj)
 
     MStatus status;
 
-    status = plugin.deregisterFileTranslator("Alembic");
+    status = plugin.deregisterFileTranslator("AlembicEx");
     if (!status)
     {
         status.perror("deregisterFileTranslator");
@@ -109,7 +109,7 @@ ALEMBIC_MAYA_PLUGIN_EXPORT  MStatus uninitializePlugin(MObject obj)
         status.perror("deregisterNode");
     }
 
-    status = plugin.deregisterCommand("AbcImport");
+    status = plugin.deregisterCommand("AbcImportEx");
     if (!status)
     {
         status.perror("deregisterCommand");
